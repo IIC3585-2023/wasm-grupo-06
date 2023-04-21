@@ -1,0 +1,25 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Array Processing</title>
+  </head>
+  <body>
+    <h1>Array Processing</h1>
+    <p>Workers</p>
+    <input type="number" id="numWorkers" placeholder="Number of Workers" />
+    <p>Generate random array</p>
+    <input type="number" id="arraySize" placeholder="Array Size" />
+    <button onclick="generateRandomArray()">Generate</button>
+    <p>Enter an array of integers separated by commas:</p>
+    <input type="text" id="inputArray" />
+    <button onclick="processInput()">Process</button>
+    <button onclick="algorithmInJS()">Process in JS</button>
+    <h2>Results:</h2>
+    <div id="output"></div>
+    <script src="main.js"></script>
+    <script src="functions.js"></script>
+  </body>
+</html>
