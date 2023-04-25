@@ -1,4 +1,3 @@
-// main.c
 #include <emscripten.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,20 +10,19 @@ typedef struct {
   int tasks_count;
 } Cluster;
 
-// int compare(const void *a, const void *b) {
-//   Cluster *clusterA = (Cluster *)a;
-//   Cluster *clusterB = (Cluster *)b;
-//   return clusterA->time - clusterB->time;
-// }
-
 int cmpfunc(const void *a, const void *b) {
-  return ((int)b - (int)a);
+  return (*(int*)b - *(int*)a);
 }
 
 EMSCRIPTEN_KEEPALIVE
 int *assign_tasks(int N, int M, int *Times) {
   
   qsort(Times, N, sizeof(int), cmpfunc);
+  // printf("Sorted array: ");
+  // for (int i = 0; i < N; i++) {
+  //   printf("%d ", Times[i]);
+  // }
+  // printf("\n");
   
   Cluster clusters[M];
   for (int i = 0; i < M; ++i) {
@@ -33,22 +31,22 @@ int *assign_tasks(int N, int M, int *Times) {
     clusters[i].tasks_count = 0;
   }
 
-  for (int i = 0; i < N; ++i) {
+  for (int i = 0; i < N; i++) {
     int min = 0;
-    for (int j = 0; j < M; ++j) {
+    for (int j = 0; j < M; j++) {
       if (clusters[j].time < clusters[min].time) {
         min = j;
       }
     }
-    clusters[min].tasks[clusters[min].tasks_count++] = i;
+    clusters[min].tasks[clusters[min].tasks_count++] = Times[i];
     clusters[min].time += Times[i];
   }
 
   // Allocate 2D array to hold cluster tasks
-  int *clusterTasks = (int *)malloc(M * N * sizeof(int *));
+  int *clusterTasks = (int *)malloc(M * N * sizeof(int));
   for (int i = 0; i < M; ++i) {
     for (int j = 0; j < clusters[i].tasks_count; ++j) {
-      clusterTasks[i * N + j] = clusters[i].tasks[j] + 1;
+      clusterTasks[i * N + j] = clusters[i].tasks[j];
     }
   }
 

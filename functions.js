@@ -8,7 +8,7 @@ function generateRandomArray() {
   let arraySize = parseInt(document.getElementById("arraySize").value);
   let inputArray = [];
   for (let i = 0; i < arraySize; i++) {
-    inputArray.push(Math.floor(Math.random() * 100));
+    inputArray.push(Math.floor(Math.random() * 1000));
   }
   inputArrayElement.value = inputArray.join(",");
 }
@@ -40,6 +40,7 @@ function algorithmInC() {
   );
   const finish = performance.now();
 
+  Module._free(inputPtr);
   let result = "";
   for (let i = 0; i < numClusters; i++) {
     let currentArray = [];
@@ -56,22 +57,22 @@ function algorithmInC() {
     result += "Total Time: " + time + "<br><br>";
   }
   outputElement.innerHTML = result;
-  Module._free(inputPtr);
+  // Module._free(inputPtr);
   Module._free(outputPtr);
   return finish - begin;
 }
 
 function calculateTotalTime(tasks) {
-  let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
-  let total = 0;
-  for (let i = 0; i < inputArray.length; i++) {
-    if (tasks[i] != 0) {
-      total += inputArray[tasks[i] - 1];
-    } else {
-      break;
-    }
-  }
-  return total;
+  // let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
+  // let total = 0;
+  // for (let i = 0; i < inputArray.length; i++) {
+  //   if (tasks[i] != 0) {
+  //     total += inputArray[tasks[i] - 1];
+  //   } else {
+  //     break;
+  //   }
+  // }
+  return tasks.reduce((acc, curr) => acc + curr, 0);
 }
 
 function algorithmInJS() {
@@ -81,8 +82,8 @@ function algorithmInJS() {
 
   const begin = performance.now();
   clusters = [];
-  inputArray.sort();
-  inputArray.reverse();
+  // inputArray = inputArray.map((string) => parseInt(string))
+  inputArray.sort((a, b) => b - a);
   for (let i = 0; i < M; i++) {
     clusters.push({
       tasks: [],
@@ -97,7 +98,7 @@ function algorithmInJS() {
         min = j;
       }
     }
-    clusters[min].tasks.push(i + 1);
+    clusters[min].tasks.push(inputArray[i]);
     clusters[min].time += inputArray[i];
     clusters[min].tasks_count++;
   }
