@@ -10,17 +10,20 @@
   <body>
     <div class="container">
       <h1>Array Processing</h1>
-      <p>Workers</p>
-      <input type="number" id="numWorkers" placeholder="Number of Workers" />
+      <p>Clusters</p>
+      <input type="number" id="numClusters" placeholder="Number of Clusters" />
       <p>Generate random array</p>
       <input type="number" id="arraySize" placeholder="Array Size" />
       <button onclick="generateRandomArray()">Generate</button>
       <p>Enter an array of integers separated by commas:</p>
       <input type="text" id="inputArray" />
-      <button onclick="processInput()">Process</button>
-      <button onclick="algorithmInJS()">Process in JS</button>
+      <button onclick="runCAlgorithm()">Process in C</button>
+      <button onclick="runJSAlgorithm()">Process in JS</button>
       <h2>Results:</h2>
-      <div id="output"></div>
+      <div id="output">
+        <h3 id="c-output"></h3>
+        <h3 id="js-output"></h3>
+      </div>
     </div>
     <script src="main.js"></script>
     <script src="functions.js"></script>
