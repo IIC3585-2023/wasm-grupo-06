@@ -16,7 +16,7 @@ int cmpfunc(const void *a, const void *b) {
 
 EMSCRIPTEN_KEEPALIVE
 int *assign_tasks(int N, int M, int *Times) {
-  qsort(Times, N, sizeof(int), cmpfunc);
+  // qsort(Times, N, sizeof(int), cmpfunc);
   
   Cluster clusters[M];
   for (int i = 0; i < M; ++i) {

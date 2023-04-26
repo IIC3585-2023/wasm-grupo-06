@@ -21,7 +21,7 @@ function algorithmInC() {
   let M = parseInt(numClustersElement.value);
   let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
   let N = inputArray.length;
-  
+  inputArray.sort((a, b) => b - a);
   let inputPtr = Module._malloc(N * Int32Array.BYTES_PER_ELEMENT);
   Module.HEAP32.set(inputArray, inputPtr / Int32Array.BYTES_PER_ELEMENT);
 
@@ -60,10 +60,9 @@ function algorithmInJS() {
   let M = parseInt(numClustersElement.value);
   let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
   let N = inputArray.length;
-
+  inputArray.sort((a, b) => b - a);
   const begin = performance.now();
   clusters = [];
-  inputArray.sort((a, b) => b - a);
   for (let i = 0; i < M; i++) {
     clusters.push({
       tasks: [],
