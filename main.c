@@ -14,6 +14,19 @@ int cmpfunc(const void *a, const void *b) {
   return (*(int*)b - *(int*)a);
 }
 
+// int sort_desc(int *Times, int N) {
+//   for (int i = 0; i < N; i++) {
+//     for (int j = i + 1; j < N; j++) {
+//       if (Times[i] < Times[j]) {
+//           int t = Times[i];
+//           Times[i] = Times[j];
+//           Times[j] = t;
+//       }
+//     }
+//   }
+//   return 0;
+// }
+
 EMSCRIPTEN_KEEPALIVE
 int *assign_tasks(int N, int M, int *Times) {
   // qsort(Times, N, sizeof(int), cmpfunc);
