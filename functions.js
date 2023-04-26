@@ -1,5 +1,5 @@
 let inputArrayElement = document.getElementById("inputArray");
-let outputElement = document.getElementById("output");
+let outputElement = document.getElementById("assignations");
 let jsOutputElement = document.getElementById("js-output");
 let cOutputElement = document.getElementById("c-output");
 let numClustersElement = document.getElementById("numClusters");
@@ -18,61 +18,42 @@ Module.onRuntimeInitialized = function () {
 };
 
 function algorithmInC() {
-  let numClusters = parseInt(numClustersElement.value);
+  let M = parseInt(numClustersElement.value);
   let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
-  let length = inputArray.length;
+  let N = inputArray.length;
   
-  let inputPtr = Module._malloc(length * Int32Array.BYTES_PER_ELEMENT);
+  let inputPtr = Module._malloc(N * Int32Array.BYTES_PER_ELEMENT);
   Module.HEAP32.set(inputArray, inputPtr / Int32Array.BYTES_PER_ELEMENT);
-
-  // let assign_tasks = Module.cwrap("assign_tasks", "number", [
-  //   "number",
-  //   "number",
-  //   "number",
-  // ]);
-  // let outputPtr = assign_tasks(length, numClusters, inputPtr);
 
   const begin = performance.now();
   let outputPtr = Module.ccall("assign_tasks",
     'number',
     ['number', 'number', 'number'],
-    [length, numClusters, inputPtr]
+    [N, M, inputPtr]
   );
   const finish = performance.now();
 
-  Module._free(inputPtr);
   let result = "";
-  for (let i = 0; i < numClusters; i++) {
+  for (let i = 0; i < M; i++) {
     let currentArray = [];
-    for (let j = 0; j < length; j++) {
+    for (let j = 0; j < N; j++) {
       currentArray.push(
         Module.HEAP32[
-          outputPtr / Int32Array.BYTES_PER_ELEMENT + (i * length + j)
+          outputPtr / Int32Array.BYTES_PER_ELEMENT + (i * N + j)
         ]
       );
     }
-    time = calculateTotalTime(currentArray);
+    time = currentArray.reduce((acc, curr) => acc + curr, 0);
     currentArray = currentArray.filter((x) => x != 0);
     result += "Cluster " + i + ": [" + currentArray.join(", ") + "]<br>";
     result += "Total Time: " + time + "<br><br>";
   }
   outputElement.innerHTML = result;
-  // Module._free(inputPtr);
-  Module._free(outputPtr);
-  return finish - begin;
-}
 
-function calculateTotalTime(tasks) {
-  // let inputArray = inputArrayElement.value.split(",").map((x) => parseInt(x));
-  // let total = 0;
-  // for (let i = 0; i < inputArray.length; i++) {
-  //   if (tasks[i] != 0) {
-  //     total += inputArray[tasks[i] - 1];
-  //   } else {
-  //     break;
-  //   }
-  // }
-  return tasks.reduce((acc, curr) => acc + curr, 0);
+  Module._free(inputPtr);
+  Module._free(outputPtr);
+  
+  return finish - begin;
 }
 
 function algorithmInJS() {
@@ -82,7 +63,6 @@ function algorithmInJS() {
 
   const begin = performance.now();
   clusters = [];
-  // inputArray = inputArray.map((string) => parseInt(string))
   inputArray.sort((a, b) => b - a);
   for (let i = 0; i < M; i++) {
     clusters.push({
@@ -103,6 +83,7 @@ function algorithmInJS() {
     clusters[min].tasks_count++;
   }
   const finish = performance.now();
+
   let result = "";
   for (let i = 0; i < M; i++) {
     result +=
@@ -115,6 +96,7 @@ function algorithmInJS() {
       "<br><br>";
   }
   outputElement.innerHTML = result;
+
   return finish - begin;
 }
 

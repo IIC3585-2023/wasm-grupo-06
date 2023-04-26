@@ -18,16 +18,12 @@ EMSCRIPTEN_KEEPALIVE
 int *assign_tasks(int N, int M, int *Times) {
   
   qsort(Times, N, sizeof(int), cmpfunc);
-  // printf("Sorted array: ");
-  // for (int i = 0; i < N; i++) {
-  //   printf("%d ", Times[i]);
-  // }
-  // printf("\n");
   
   Cluster clusters[M];
   for (int i = 0; i < M; ++i) {
     clusters[i].time = 0;
-    clusters[i].tasks = (int *)malloc(N * sizeof(int));
+    // clusters[i].tasks = (int *)malloc(N * sizeof(int));
+    clusters[i].tasks = (int *)calloc(N, sizeof(int));
     clusters[i].tasks_count = 0;
   }
 
@@ -43,7 +39,8 @@ int *assign_tasks(int N, int M, int *Times) {
   }
 
   // Allocate 2D array to hold cluster tasks
-  int *clusterTasks = (int *)malloc(M * N * sizeof(int));
+  // int *clusterTasks = (int *)malloc(M * N * sizeof(int));
+  int *clusterTasks = (int *)calloc(M * N, sizeof(int));
   for (int i = 0; i < M; ++i) {
     for (int j = 0; j < clusters[i].tasks_count; ++j) {
       clusterTasks[i * N + j] = clusters[i].tasks[j];
