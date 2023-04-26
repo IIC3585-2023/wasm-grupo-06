@@ -1,64 +1,59 @@
-// main.c
 #include <emscripten.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// int *process_array(int *input, int length) {
-//   int *output = (int *)malloc(length * 4 * sizeof(int));
-//   for (int i = 0; i < 4; i++) {
-//     for (int j = 0; j < length; j++) {
-//       output[i * length + j] = input[j] * (1 << i);
-//     }
-//   }
-//   return output;
-// }
 
 typedef struct {
   int time;
   int *tasks;
-  int task_count;
-} Worker;
+  int tasks_count;
+} Cluster;
 
-int compare(const void *a, const void *b) {
-  Worker *workerA = (Worker *)a;
-  Worker *workerB = (Worker *)b;
-  return workerA->time - workerB->time;
+int cmpfunc(const void *a, const void *b) {
+  return (*(int*)b - *(int*)a);
 }
 
 EMSCRIPTEN_KEEPALIVE
-int *process_array(int N, int M, int *Times) {
-  Worker workersTasks[M];
+int *assign_tasks(int N, int M, int *Times) {
+  qsort(Times, N, sizeof(int), cmpfunc);
+  
+  Cluster clusters[M];
   for (int i = 0; i < M; ++i) {
-    workersTasks[i].time = 0;
-    workersTasks[i].tasks = (int *)malloc(N * sizeof(int));
-    workersTasks[i].task_count = 0;
+    clusters[i].time = 0;
+    // clusters[i].tasks = (int *)malloc(N * sizeof(int));
+    clusters[i].tasks = (int *)calloc(N, sizeof(int));
+    clusters[i].tasks_count = 0;
   }
 
-  for (int i = 0; i < N; ++i) {
+  int *clusterTasks = (int *)calloc(M * N, sizeof(int));
+
+  for (int i = 0; i < N; i++) {
     int min = 0;
-    for (int j = 0; j < M; ++j) {
-      if (workersTasks[j].time < workersTasks[min].time) {
+    for (int j = 0; j < M; j++) {
+      if (clusters[j].time < clusters[min].time) {
         min = j;
       }
     }
-    workersTasks[min].tasks[workersTasks[min].task_count++] = i;
-    workersTasks[min].time += Times[i];
+    
+    // clusters[min].tasks[clusters[min].tasks_count++] = Times[i];
+    clusterTasks[min * N + clusters[min].tasks_count++] = Times[i];
+    clusters[min].time += Times[i];
   }
 
-  // Allocate 2D array to hold worker tasks
-  int *workerTasks = (int *)malloc(M * N * sizeof(int *));
+  // Allocate 2D array to hold cluster tasks
+  // int *clusterTasks = (int *)malloc(M * N * sizeof(int));
+  
+  // for (int i = 0; i < M; ++i) {
+  //   for (int j = 0; j < clusters[i].tasks_count; ++j) {
+  //     clusterTasks[i * N + j] = clusters[i].tasks[j];
+  //   }
+  // }
+
+  // Free allocated memory in Cluster structs
   for (int i = 0; i < M; ++i) {
-    for (int j = 0; j < workersTasks[i].task_count; ++j) {
-      workerTasks[i * N + j] = workersTasks[i].tasks[j] + 1;
-    }
+    free(clusters[i].tasks);
   }
-
-  // Free allocated memory in Worker structs
-  for (int i = 0; i < M; ++i) {
-    free(workersTasks[i].tasks);
-  }
-
-  // Return array of arrays containing worker tasks
-  return workerTasks;
+  // Return array of arrays containing cluster tasks
+  return clusterTasks;
 }
